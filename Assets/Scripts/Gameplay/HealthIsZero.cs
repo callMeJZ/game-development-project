@@ -1,5 +1,6 @@
 using Platformer.Core;
 using Platformer.Mechanics;
+using Platformer.Model;
 using static Platformer.Core.Simulation;
 
 namespace Platformer.Gameplay
@@ -15,7 +16,9 @@ namespace Platformer.Gameplay
 
         public override void Execute()
         {
-            Schedule<PlayerDeath>();
+            var model = Simulation.GetModel<PlatformerModel>();
+            if (model.player != null && health == model.player.health)
+                Schedule<PlayerDeath>();
         }
     }
 }

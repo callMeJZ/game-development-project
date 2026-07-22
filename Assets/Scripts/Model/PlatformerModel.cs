@@ -38,5 +38,17 @@ namespace Platformer.Model
         /// </summary>
         public float jumpDeceleration = 0.5f;
 
+        [Header("MVP progression")]
+        public int score;
+        public int tokenScore = 100;
+        public int enemyScore = 250;
+        public int levelCompleteScore = 500;
+        public bool levelComplete;
+
+        public void AddScore(int points)
+        {
+            score = Mathf.Max(0, score + points);
+        }
+
     }
 }

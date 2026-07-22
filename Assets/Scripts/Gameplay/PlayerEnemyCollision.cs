@@ -31,6 +31,7 @@ namespace Platformer.Gameplay
                     if (!enemyHealth.IsAlive)
                     {
                         Schedule<EnemyDeath>().enemy = enemy;
+                        model.AddScore(model.enemyScore);
                         player.Bounce(2);
                     }
                     else
@@ -41,12 +42,21 @@ namespace Platformer.Gameplay
                 else
                 {
                     Schedule<EnemyDeath>().enemy = enemy;
+                    model.AddScore(model.enemyScore);
                     player.Bounce(2);
                 }
             }
             else
             {
-                Schedule<PlayerDeath>();
+                if (player.health != null && player.health.TryDecrement())
+                {
+                    if (player.health.IsAlive)
+                    {
+                        player.animator.SetTrigger("hurt");
+                        if (player.audioSource && player.ouchAudio)
+                            player.audioSource.PlayOneShot(player.ouchAudio);
+                    }
+                }
             }
         }
     }

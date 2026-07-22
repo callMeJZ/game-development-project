@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using Platformer.Core;
+using Platformer.Mechanics;
 using Platformer.Model;
 using UnityEngine;
 
@@ -17,20 +18,29 @@ namespace Platformer.Gameplay
         public override void Execute()
         {
             var player = model.player;
+            if (player == null || player.IsDead)
+                return;
+
+            player.IsDead = true;
+            player.controlEnabled = false;
+            player.jumpState = PlayerController.JumpState.Grounded;
+            player.collider2d.enabled = false;
+            player.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
+
             if (player.health.IsAlive)
-            {
                 player.health.Die();
+
+            if (model.virtualCamera != null)
+            {
                 model.virtualCamera.Follow = null;
                 model.virtualCamera.LookAt = null;
-                // player.collider.enabled = false;
-                player.controlEnabled = false;
-
-                if (player.audioSource && player.ouchAudio)
-                    player.audioSource.PlayOneShot(player.ouchAudio);
-                player.animator.SetTrigger("hurt");
-                player.animator.SetBool("dead", true);
-                Simulation.Schedule<PlayerSpawn>(2);
             }
+
+            if (player.audioSource && player.ouchAudio)
+                player.audioSource.PlayOneShot(player.ouchAudio);
+            player.animator.SetTrigger("hurt");
+            player.animator.SetBool("dead", true);
+            Simulation.Schedule<PlayerSpawn>(2);
         }
     }
 }
