@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PauseMenu : MonoBehaviour {
     public static bool GameIsPaused = false;
@@ -9,7 +10,7 @@ public class PauseMenu : MonoBehaviour {
 
     void Update () 
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
         {
             if (GameIsPaused)
             {

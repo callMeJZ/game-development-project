@@ -16,7 +16,7 @@ public class FishCollection : MonoBehaviour
 
     void Start()
     {
-        gateController = FindObjectOfType<GateController>();
+        gateController = FindAnyObjectByType<GateController>();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

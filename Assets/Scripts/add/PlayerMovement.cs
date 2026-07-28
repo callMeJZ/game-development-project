@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -53,7 +54,10 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        directionX = Input.GetAxisRaw("Horizontal");
+        directionX = GetHorizontalInput();
+        bool jumpHeld = IsJumpHeld();
+        bool jumpPressed = WasJumpPressedThisFrame();
+        bool jumpReleased = WasJumpReleasedThisFrame();
         parent = transform.parent;
         //move left or right
   
@@ -68,7 +72,7 @@ public class PlayerMovement : MonoBehaviour
             coyoteTimeCounter -= Time.deltaTime;
         }
         
-        if ((IsPlayerGrounded() && !Input.GetButton("Jump") && (body.linearVelocity.y >= -0.001f && body.linearVelocity.y <= 0.001f)) || (!Input.GetButton("Jump") && parent != null))
+        if ((IsPlayerGrounded() && !jumpHeld && (body.linearVelocity.y >= -0.001f && body.linearVelocity.y <= 0.001f)) || (!jumpHeld && parent != null))
         {
             if (doubleJump)
             {
@@ -77,7 +81,7 @@ public class PlayerMovement : MonoBehaviour
             doubleJump = false;
         }
     
-        if ((Input.GetButtonDown("Jump") && (coyoteTimeCounter > 0f || doubleJump)) || (isWallSliding && Input.GetButtonDown("Jump")))
+        if ((jumpPressed && (coyoteTimeCounter > 0f || doubleJump)) || (isWallSliding && jumpPressed))
         {
             body.linearVelocity = new Vector2(body.linearVelocity.x, jumpForce);
             coyoteTimeCounter = 0f;
@@ -90,7 +94,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         //The longer you hold jump button the higher to jump
-        if (Input.GetButtonUp("Jump") && body.linearVelocity.y > 0f)
+        if (jumpReleased && body.linearVelocity.y > 0f)
         {   
             body.linearVelocity = new Vector2(body.linearVelocity.x, body.linearVelocity.y * 0.5f);
         }
@@ -167,6 +171,61 @@ public class PlayerMovement : MonoBehaviour
         }
         
         anim.SetInteger("state", (int)state);
+    }
+
+    private float GetHorizontalInput()
+    {
+        float keyboardDirection = 0f;
+        Keyboard keyboard = Keyboard.current;
+        if (keyboard != null)
+        {
+            if (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed)
+            {
+                keyboardDirection -= 1f;
+            }
+            if (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed)
+            {
+                keyboardDirection += 1f;
+            }
+        }
+
+        Gamepad gamepad = Gamepad.current;
+        if (gamepad != null && Mathf.Abs(gamepad.leftStick.x.ReadValue()) > Mathf.Abs(keyboardDirection))
+        {
+            return Mathf.Clamp(gamepad.leftStick.x.ReadValue(), -1f, 1f);
+        }
+
+        return Mathf.Clamp(keyboardDirection, -1f, 1f);
+    }
+
+    private bool IsJumpHeld()
+    {
+        Keyboard keyboard = Keyboard.current;
+        bool keyboardJump = keyboard != null &&
+            (keyboard.spaceKey.isPressed || keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed);
+
+        Gamepad gamepad = Gamepad.current;
+        return keyboardJump || (gamepad != null && gamepad.buttonSouth.isPressed);
+    }
+
+    private bool WasJumpPressedThisFrame()
+    {
+        Keyboard keyboard = Keyboard.current;
+        bool keyboardJump = keyboard != null &&
+            (keyboard.spaceKey.wasPressedThisFrame || keyboard.wKey.wasPressedThisFrame || keyboard.upArrowKey.wasPressedThisFrame);
+
+        Gamepad gamepad = Gamepad.current;
+        return keyboardJump || (gamepad != null && gamepad.buttonSouth.wasPressedThisFrame);
+    }
+
+    private bool WasJumpReleasedThisFrame()
+    {
+        Keyboard keyboard = Keyboard.current;
+        bool keyboardJump = keyboard != null &&
+            (keyboard.spaceKey.wasReleasedThisFrame || keyboard.wKey.wasReleasedThisFrame || keyboard.upArrowKey.wasReleasedThisFrame);
+
+        Gamepad gamepad = Gamepad.current;
+        return keyboardJump || (gamepad != null && gamepad.buttonSouth.wasReleasedThisFrame);
     }
 
     void OnTriggerEnter2D (Collider2D other)

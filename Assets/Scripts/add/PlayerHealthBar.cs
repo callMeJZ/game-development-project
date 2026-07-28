@@ -10,7 +10,7 @@ public class PlayerHealthBar : MonoBehaviour
     [SerializeField]private Image currentHealthBar;
     void Awake()
     {
-        playerHealth = FindObjectOfType<PlayerHealth>();
+        playerHealth = FindAnyObjectByType<PlayerHealth>();
         totalHealthBar.fillAmount = (playerHealth.startingHealth.Value) / 10;
     }
     void Update()

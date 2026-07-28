@@ -12,6 +12,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Level1_Village.unity
     guid: 549f2ee3adc868e41a7d7028dcfef1d1
   - enabled: 1
+    path: Assets/Scenes/level2_factory.unity
+    guid: c5c8191e5def7054bb1098271516e047
+  - enabled: 1
     path: Assets/Scenes/Gylfi Scene Level 2.unity
     guid: f57a8283ed6564f4c8b1d19dbe83d6f6
   - enabled: 1
@@ -23,9 +26,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Main Scene Level 2.unity
     guid: 3927e1d53308eab4186c4b7b5f56b295
-  - enabled: 1
-    path: Assets/Scenes/level2_factory.unity
-    guid: c5c8191e5def7054bb1098271516e047
   m_configObjects:
+    com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f,
+      type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 5e716bb9195b9eb49a2ccb4c51691dc6,
       type: 3}

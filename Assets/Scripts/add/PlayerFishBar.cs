@@ -10,7 +10,7 @@ public class PlayerFishBar : MonoBehaviour
     [SerializeField]private Image currentFishBar;
     void Awake()
     {
-        fishCollection = FindObjectOfType<FishCollection>();
+        fishCollection = FindAnyObjectByType<FishCollection>();
         totalFishBar.fillAmount = fishCollection.totalFish/5;
     }
     void Update()

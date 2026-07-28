@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.InputSystem;
 public class PlayerHealth : MonoBehaviour
 {
     [SerializeField]private AudioSource hurtSound;
@@ -127,7 +128,7 @@ public class PlayerHealth : MonoBehaviour
             {
                 playerMovement.doubleJump = true;
                 dogHowl.Play();
-                if (Input.GetButton("Jump"))
+                if (IsJumpHeld())
                 {
                     body.linearVelocity = new Vector2(body.linearVelocity.x, 22f);
                 }
@@ -162,6 +163,16 @@ public class PlayerHealth : MonoBehaviour
         {
             currentHealth.Value = 9;
         }
+    }
+
+    private bool IsJumpHeld()
+    {
+        Keyboard keyboard = Keyboard.current;
+        bool keyboardJump = keyboard != null &&
+            (keyboard.spaceKey.isPressed || keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed);
+
+        Gamepad gamepad = Gamepad.current;
+        return keyboardJump || (gamepad != null && gamepad.buttonSouth.isPressed);
     }
 
     public void _RestartLevel()
