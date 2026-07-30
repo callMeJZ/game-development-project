@@ -36,13 +36,16 @@ public class PlayerHealth : MonoBehaviour
 
     private void Update()
     {
-        if (spriteRend.flipX)
+        if (livesLostText != null && spriteRend != null)
         {
-            livesLostText.alignment = TextAlignmentOptions.Right;
-        } 
-        else
-        {
-            livesLostText.alignment = TextAlignmentOptions.Left;
+            if (spriteRend.flipX)
+            {
+                livesLostText.alignment = TextAlignmentOptions.Right;
+            } 
+            else
+            {
+                livesLostText.alignment = TextAlignmentOptions.Left;
+            }
         }
     }
     private void OnTriggerEnter2D(Collider2D collision)
@@ -60,8 +63,11 @@ public class PlayerHealth : MonoBehaviour
         if (currentHealth.Value > 0)
         {
             //player hurt
-            livesLostText.text = "-1";
-            StartCoroutine(DisplayTextFor2Seconds());
+            if (livesLostText != null)
+            {
+                livesLostText.text = "-1";
+                StartCoroutine(DisplayTextFor2Seconds());
+            }
             anim.SetTrigger("hurt");
             StartCoroutine(Invulnerability());
             hurtSound.Play();
@@ -74,6 +80,7 @@ public class PlayerHealth : MonoBehaviour
     }
     private IEnumerator DisplayTextFor2Seconds()
     {
+        if (livesLostText == null) yield break;
         livesLostText.enabled = true;
         yield return new WaitForSeconds(2);
         livesLostText.enabled = false;
@@ -85,8 +92,11 @@ public class PlayerHealth : MonoBehaviour
         if (currentHealth.Value > 0)
         {
             //player hurt
-            livesLostText.text = "-2";
-            StartCoroutine(DisplayTextFor2Seconds());
+            if (livesLostText != null)
+            {
+                livesLostText.text = "-2";
+                StartCoroutine(DisplayTextFor2Seconds());
+            }
             anim.SetTrigger("hurt");
             StartCoroutine(Invulnerability());
             hurtSound.Play();

@@ -12,6 +12,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Level1_Village.unity
     guid: 549f2ee3adc868e41a7d7028dcfef1d1
   - enabled: 1
+    path: Assets/Scenes/fixedLevel2.unity
+    guid: 5afd2e1a108e0c74f99b742d048159d1
+  - enabled: 1
     path: Assets/Scenes/level2_factory.unity
     guid: c5c8191e5def7054bb1098271516e047
   - enabled: 1
