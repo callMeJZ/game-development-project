@@ -137,7 +137,10 @@ public class PlayerHealth : MonoBehaviour
             else
             {
                 playerMovement.doubleJump = true;
-                dogHowl.Play();
+                if (dogHowl != null)
+                {
+                    dogHowl.Play();
+                }
                 if (IsJumpHeld())
                 {
                     body.linearVelocity = new Vector2(body.linearVelocity.x, 22f);
