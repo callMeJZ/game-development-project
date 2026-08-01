@@ -2751,6 +2751,12 @@ Transform:
   - {fileID: 480004327}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!82 &312076747 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 9135218028833630858, guid: e12cff5a9233c0e4c8eced0fb355edbb,
+    type: 3}
+  m_PrefabInstance: {fileID: 1656247451}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &318776226
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -91127,6 +91133,14 @@ PrefabInstance:
       propertyPath: m_Offset.y
       value: 0.0023683608
       objectReference: {fileID: 0}
+    - target: {fileID: 1824045667, guid: 7d60c822c3f1b408ea7a00ecdb5e047a, type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.x
+      value: 0.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 1824045667, guid: 7d60c822c3f1b408ea7a00ecdb5e047a, type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.y
+      value: 0.78
+      objectReference: {fileID: 0}
     - target: {fileID: 1208144871472054, guid: 7d60c822c3f1b408ea7a00ecdb5e047a, type: 3}
       propertyPath: m_Name
       value: Player
@@ -91224,6 +91238,11 @@ PrefabInstance:
       propertyPath: m_Color.r
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 212064061491315838, guid: 7d60c822c3f1b408ea7a00ecdb5e047a,
+        type: 3}
+      propertyPath: m_WasSpriteAssigned
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -91232,6 +91251,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 838423050}
+    - targetCorrespondingSourceObject: {fileID: 1208144871472054, guid: 7d60c822c3f1b408ea7a00ecdb5e047a,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1213308514}
   m_SourcePrefab: {fileID: 100100000, guid: 7d60c822c3f1b408ea7a00ecdb5e047a, type: 3}
 --- !u!114 &838423048 stripped
 MonoBehaviour:
@@ -94122,6 +94145,27 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 838423047}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1213308514
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 838423049}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c95aa8efaac38ab419dbb075148115e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
+  hurtSound: {fileID: 0}
+  deathSound: {fileID: 0}
+  dogBark: {fileID: 312076747}
+  dogHowl: {fileID: 0}
+  startingHealth: {fileID: 11400000, guid: e92dc21fcf9b92e438deb18dddbdbb98, type: 2}
+  livesLostText: {fileID: 0}
+  currentHealth: {fileID: 11400000, guid: 37edf5a15249636429287a5e381f4fb4, type: 2}
+  iFramesDuration: 0
+  numberOfFlashes: 0
 --- !u!1001 &1223006653
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using Platformer.Core;
+using Platformer.Model;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -18,6 +20,8 @@ public class PlayerHealth : MonoBehaviour
     private BoxCollider2D coll;
     [SerializeField]public FloatSo currentHealth;
     private bool isImmune = false;
+    private bool isDead = false;
+    private float nextDamageTime = 0f;
 
     private PlayerMovement playerMovement;
 
@@ -32,6 +36,7 @@ public class PlayerHealth : MonoBehaviour
         anim = GetComponent<Animator>();
         spriteRend = GetComponent<SpriteRenderer>();
         playerMovement = GetComponent<PlayerMovement>();
+        ResetLives();
     }
 
     private void Update()
@@ -47,34 +52,53 @@ public class PlayerHealth : MonoBehaviour
                 livesLostText.alignment = TextAlignmentOptions.Left;
             }
         }
+
+        CheckDogOverlap();
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.CompareTag("RottenFish"))
+        if (IsTagged(collision.gameObject, "RottenFish"))
         {
             Take1Damage();
             Destroy(collision.gameObject);
         }
+        else if (IsDog(collision.gameObject))
+        {
+            HurtFromDog();
+        }
+    }
+
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (IsDog(collision.gameObject))
+        {
+            HurtFromDog();
+        }
     }
     public void Take1Damage()
     {
+        if (isDead || currentHealth == null || Time.time < nextDamageTime)
+        {
+            return;
+        }
+
+        nextDamageTime = Time.time + 1f;
         currentHealth.Value -= 1;
 
         if (currentHealth.Value > 0)
         {
-            //player hurt
             if (livesLostText != null)
             {
                 livesLostText.text = "-1";
                 StartCoroutine(DisplayTextFor2Seconds());
             }
-            anim.SetTrigger("hurt");
+
+            TriggerHurtAnimation();
             StartCoroutine(Invulnerability());
-            hurtSound.Play();
+            PlayAudio(hurtSound);
         }
         else
         {
-            //player dead
             PlayerDeath();
         }
     }
@@ -87,23 +111,28 @@ public class PlayerHealth : MonoBehaviour
     }
     public void Take2Damage()
     {
+        if (isDead || currentHealth == null || Time.time < nextDamageTime)
+        {
+            return;
+        }
+
+        nextDamageTime = Time.time + 1f;
         currentHealth.Value -= 2;
 
         if (currentHealth.Value > 0)
         {
-            //player hurt
             if (livesLostText != null)
             {
                 livesLostText.text = "-2";
                 StartCoroutine(DisplayTextFor2Seconds());
             }
-            anim.SetTrigger("hurt");
+
+            TriggerHurtAnimation();
             StartCoroutine(Invulnerability());
-            hurtSound.Play();
+            PlayAudio(hurtSound);
         }
         else
         {
-            //player dead
             PlayerDeath();
         }
     }
@@ -112,60 +141,136 @@ public class PlayerHealth : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Trap"))
+        if (IsTagged(collision.gameObject, "Trap"))
         {
             Take1Damage();
         }
 
-        else if (collision.gameObject.CompareTag("Enemy"))
+        else if (IsTagged(collision.gameObject, "Enemy"))
         {
             if ((collision.gameObject.transform.position.y + 1.5f) > this.transform.position.y)
             {
-                if (isImmune==false){
-                Take2Damage();}
+                if (!isImmune)
+                {
+                    Take2Damage();
+                }
             }
         }
-        else if (collision.gameObject.CompareTag("Dog"))
+        else if (IsDog(collision.gameObject))
         {
-            if (collision.gameObject.transform.position.y + 1.5f > this.transform.position.y)
-            {
-                if (isImmune==false){
-                dogBark.Play();
-                Take2Damage();}
-            }
-
-            else
-            {
-                playerMovement.doubleJump = true;
-                if (dogHowl != null)
-                {
-                    dogHowl.Play();
-                }
-                if (IsJumpHeld())
-                {
-                    body.linearVelocity = new Vector2(body.linearVelocity.x, 22f);
-                }
-                else
-                {
-                    body.linearVelocity = new Vector2(body.linearVelocity.x, 14f);
-                }
-                
-            }
+            HurtFromDog();
         }
-
     }
 
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        if (IsDog(collision.gameObject))
+        {
+            HurtFromDog();
+        }
+    }
+
+    private void HurtFromDog()
+    {
+        if (isImmune || isDead || currentHealth == null || currentHealth.Value <= 0 || Time.time < nextDamageTime)
+        {
+            return;
+        }
+
+        PlayAudio(dogBark);
+        Take1Damage();
+    }
+
+    private void CheckDogOverlap()
+    {
+        if (coll == null || isImmune || isDead)
+        {
+            return;
+        }
+
+        Bounds bounds = coll.bounds;
+        bounds.Expand(new Vector3(0.5f, 0.5f, 0f));
+
+        Collider2D[] hits = Physics2D.OverlapBoxAll(bounds.center, bounds.size, 0f);
+        foreach (Collider2D hit in hits)
+        {
+            if (hit != null && hit.gameObject != gameObject && IsDog(hit.gameObject))
+            {
+                HurtFromDog();
+                return;
+            }
+        }
+    }
+
+    private bool IsTagged(GameObject target, string tagName)
+    {
+        return target != null && target.tag == tagName;
+    }
+
+    private bool IsDog(GameObject target)
+    {
+        if (target == null)
+        {
+            return false;
+        }
+
+        return IsTagged(target, "Dog") || target.name.Contains("Dog");
+    }
+
+    private void TriggerHurtAnimation()
+    {
+        if (anim == null)
+        {
+            return;
+        }
+
+        foreach (var parameter in anim.parameters)
+        {
+            if (parameter.name == "hurt" && parameter.type == AnimatorControllerParameterType.Trigger)
+            {
+                anim.SetTrigger("hurt");
+                return;
+            }
+        }
+    }
+
+    private void PlayAudio(AudioSource audioSource)
+    {
+        if (audioSource != null)
+        {
+            audioSource.Play();
+        }
+    }
 
     public void PlayerDeath()
     {
-        deathSound.Play();
-        coll.enabled = false;
-        body.bodyType = RigidbodyType2D.Static;
-        anim.SetTrigger("death_trigger");
+        if (isDead)
+        {
+            return;
+        }
+
+        isDead = true;
+        PlayAudio(deathSound);
+        StopCameraFollow();
+
+        if (coll != null)
+        {
+            coll.enabled = false;
+        }
+
+        if (body != null)
+        {
+            body.bodyType = RigidbodyType2D.Static;
+        }
+
+        TriggerDeathAnimation();
+        Invoke(nameof(ReloadCurrentScene), 2f);
     }
 
     public void ResetLives()
     {
+        isDead = false;
+        nextDamageTime = 0f;
         currentHealth.Value = startingHealth.Value;
     }
 
@@ -199,7 +304,13 @@ public class PlayerHealth : MonoBehaviour
     //reloads current level
     public void RestartLevel()
     {
-        Invoke("_RestartLevel", 2);
+        Invoke(nameof(ReloadCurrentScene), 2);
+    }
+
+    private void ReloadCurrentScene()
+    {
+        ResetLives();
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     private IEnumerator Invulnerability()
@@ -215,6 +326,55 @@ public class PlayerHealth : MonoBehaviour
         }
         Physics2D.IgnoreLayerCollision(9, 12, false);
         isImmune=false;
+    }
+
+    private void StopCameraFollow()
+    {
+        var model = Simulation.GetModel<PlatformerModel>();
+        if (model.virtualCamera != null)
+        {
+            if (model.virtualCamera.Follow == transform)
+            {
+                model.virtualCamera.Follow = null;
+            }
+
+            if (model.virtualCamera.LookAt == transform)
+            {
+                model.virtualCamera.LookAt = null;
+            }
+        }
+
+        var cameraControllers = FindObjectsByType<CameraController>(FindObjectsSortMode.None);
+        foreach (var cameraController in cameraControllers)
+        {
+            cameraController.StopFollowing(transform);
+        }
+    }
+
+    private void TriggerDeathAnimation()
+    {
+        if (anim == null)
+        {
+            return;
+        }
+
+        foreach (var parameter in anim.parameters)
+        {
+            if (parameter.name == "death_trigger" && parameter.type == AnimatorControllerParameterType.Trigger)
+            {
+                anim.SetTrigger("death_trigger");
+                return;
+            }
+        }
+
+        foreach (var parameter in anim.parameters)
+        {
+            if (parameter.name == "dead" && parameter.type == AnimatorControllerParameterType.Bool)
+            {
+                anim.SetBool("dead", true);
+                return;
+            }
+        }
     }
 
 }

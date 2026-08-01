@@ -5,6 +5,11 @@ TagManager:
   serializedVersion: 3
   tags:
   - TutorialRequirement
+  - Dog
+  - RottenFish
+  - Trap
+  - Enemy
+  - SpeedBoostFish
   layers:
   - Default
   - TransparentFX

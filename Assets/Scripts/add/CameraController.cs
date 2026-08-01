@@ -9,10 +9,28 @@ public class CameraController : MonoBehaviour
 
     void Awake()
     {
-        player = GameObject.FindGameObjectWithTag("Player").transform;
+        var playerObject = GameObject.FindGameObjectWithTag("Player");
+        if (playerObject != null)
+        {
+            player = playerObject.transform;
+        }
     }
     private void Update()
     {
+        if (player == null)
+        {
+            return;
+        }
+
         transform.position = new Vector3(player.position.x, player.position.y, transform.position.z);
+    }
+
+    public void StopFollowing(Transform target)
+    {
+        if (player == target)
+        {
+            player = null;
+            enabled = false;
+        }
     }
 }
