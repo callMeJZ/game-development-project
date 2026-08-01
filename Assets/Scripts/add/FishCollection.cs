@@ -10,13 +10,15 @@ public class FishCollection : MonoBehaviour
 
     [SerializeField]public float totalFish = 1;
     [SerializeField] private AudioSource itemCollectingSound;
+    [SerializeField] private float speedBoostMultiplier = 1.8f;
+    [SerializeField] private float speedBoostDuration = 5f;
     private GateController gateController;
-
-  
+    private PlayerMovement playerMovement;
 
     void Start()
     {
         gateController = FindAnyObjectByType<GateController>();
+        playerMovement = GetComponent<PlayerMovement>();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -26,7 +28,14 @@ public class FishCollection : MonoBehaviour
             itemCollectingSound.Play();
             Destroy(collision.gameObject);
             fishCollected++;
-        }    
+        }
+        else if (collision.gameObject.CompareTag("SpeedBoostFish"))
+        {
+            if (itemCollectingSound != null) itemCollectingSound.Play();
+            Destroy(collision.gameObject);
+            if (playerMovement != null)
+                playerMovement.ActivateSpeedBoost(speedBoostMultiplier, speedBoostDuration);
+        }
     }
 
     private void Update()
@@ -37,6 +46,4 @@ public class FishCollection : MonoBehaviour
             isOpen = true; 
         }
     }
-    
-    
 }

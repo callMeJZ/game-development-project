@@ -40,7 +40,8 @@ public class PlayerMovement : MonoBehaviour
 
     private float coyoteTime = 0.2f;
     private float coyoteTimeCounter;
-
+    private float baseSpeed;
+    private Coroutine speedBoostRoutine;
 
     // Start is called before the first frame update
     void Start()
@@ -50,8 +51,26 @@ public class PlayerMovement : MonoBehaviour
         coll = GetComponent<BoxCollider2D>();
         anim = GetComponent<Animator>();
         sprite = GetComponent<SpriteRenderer>();
-    }
 
+        baseSpeed = movementSpeed;
+    }
+    public void ActivateSpeedBoost(float multiplier, float duration)
+{
+    if (speedBoostRoutine != null)
+    {
+        StopCoroutine(speedBoostRoutine);
+        movementSpeed = baseSpeed;
+    }
+    speedBoostRoutine = StartCoroutine(SpeedBoostRoutine(multiplier, duration));
+}
+
+private IEnumerator SpeedBoostRoutine(float multiplier, float duration)
+{
+    movementSpeed = baseSpeed * multiplier;
+    yield return new WaitForSeconds(duration);
+    movementSpeed = baseSpeed;
+    speedBoostRoutine = null;
+}
     // Update is called once per frame
     void Update()
     {
