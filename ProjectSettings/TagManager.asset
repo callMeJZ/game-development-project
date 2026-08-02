@@ -10,6 +10,8 @@ TagManager:
   - Trap
   - Enemy
   - SpeedBoostFish
+  - Platform
+  - Fish
   layers:
   - Default
   - TransparentFX
